@@ -1,0 +1,74 @@
+Belzebut's Saga - de Istrate Sebastian
+
+game.Main: clasa principala care initializeaza si ruleaza un joc (Game)
+game.Handler: handler-ul il vom transmite in majoritatea claselor ca atribut.
+	Prin el vom putea gasi usor lumea/playerul/alte lucruri utile jocului
+		Exemplu: handler.getWorld().getEntityManager().getPlayer()
+		Doar asa putem gasi playerul in orice moment
+game.Game: Initializeaza graficile, resursele si State-ul
+	In functia run(): se apeleaza constant tick() si render() pentru jocul nostru
+	pana cand inchidem jocul.
+	La randul lor, functiile tick() si render() din Game vor apela aceleasi functii
+	din starea curenta(State)
+Starea curenta: MenuState, SettingsState, StoryState - sunt asemanatoare
+		- folosesc butoane pentru a interactiona in meniu
+		GameState, porneste un joc nou (World)
+
+game.World: aici incepe jocul propriu zis.
+	Se initializeaza: incarca harta si entitatile prin caile date ca parametri
+	(pathW, pathE)
+	Se apeleaza recursiv metodele tick() si render(), derivate din Game()
+
+Pe acest principiu a fost gandit jocul cu toate entitatile sale:
+Game.tick() -> World.tick() -> Entities.tick() -> player.tick() -> inventory.tick() (daca este cazul)
+Game.render() -> World.render() -> Entities.render() -> player.render() -> inventory.tick() (daca este cazul)
+
+Lumea noastra (World) este construita dintr-o matrice de tile-uri,
+	iteme si entitati.
+Entitatile la randul lor pot fi statice (copaci, pietre, etc) sau dinamice,
+adica creaturile (Creature). Creaturile se impart in Monstri si player.
+
+Cum tile-urile nu se vor modifica niciodata in matrice, nu mai apelam tiles.tick()
+Entitatile si itemele se pot schimba, deci se apeleaza atat functia tick(), cat si render()
+
+
+Pentru majoritatea partilor mari din joc s-a creat un Manager care tine evidenta tuturor obiectelor/claselor din acea zona.
+De exemplu: entityManager contine o lista de entitati care vor fi sortate dupa
+coordonate pentru a se randa in ordinea corecta.
+	    itemManager contine o lista de iteme pe care le gasim pe jos,
+		pana in momentul in care le culegem.
+Obs: Itemele vor fi dropate la distrugerea unui obiect. (Copac -> Lemn)
+
+Player-ul contine un inventar pe care il va deschide/inchide apasand tasta E in joc
+Inventarul contine o lista de iteme pe care le va afisa grafic si cu care jucatorul
+va putea evolua.
+
+Toate resursele grafice se vor incarca in fisierul gfx.Assets, static.
+----------------------------------------------------------------------
+Revenind la MenuState, in meniul principal:
+Se observa ca avem un uiManager in care vom adauga o lista de butoane cu care
+va putea interactiona utilizatorul (uiManager.addObject())
+
+Level-urile vor avea 3 imagini (simplu, hover si inaccesibil), int timp ce celelalte
+setari nu vor avea imaginea cu inaccesibil.
+uiManager.addObject(new UIImageButton(0,...) acel 0 ne ajuta sa aflam daca butonul
+este de tip nivel sau nu. 0 = nu.
+
+La apasarea unui buton (onClick()) se va schimba starea curenta.
+levelState si SettingsState sunt asemanatoare ca principiu de functionare.
+
+S-a folosit sablonul Factory Method (Design Pattern) pentru modul creativ al jocului
+Cand se creeaza un obiect, se apeleaza functi getEntity, cu parametru un string si returneaza
+o entitate.
+
+---------------------------------------------------------------------
+Pentru a activa codurile (cheats):
+CTRL + 1 + 0 =  creativeMode enabled/disabled
+ALT + 1,2,3,4,5,6,7,8,9,0,q,w,e,r,t,y,... - spawning items (after left click)
+
+CTRL + 2 = increase exp
+CTRL + 3 = add a lot of items
+CTRL + 4 = fly mode enabled/disabled.
+
+
+

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Belzebut's Saga:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Belzebut_s_Saga_jar</output-path>
+    <root id="archive" name="Belzebut's Saga.jar">
+      <element id="module-output" name="Belzebut's Saga" />
+    </root>
+  </artifact>
+</component>
